@@ -1,0 +1,31 @@
+{
+    "name": "QA Extension Assistant",
+    "version": "1.0",
+    "description": "Try to speed up lead review by limiting clicks and extending the viewport.",
+     "permissions": ["declarativeContent", "storage", "activeTab", "tabs"],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": ["content.js"]
+        }
+    ],
+    "browser_action": {
+        "default_icon": {
+            "16": "images/quabity_16.png",
+            "32": "images/quabity_32.png",
+            "48": "images/quabity_48.png",
+            "128": "images/quabity_128.png"
+        },
+        "default_popup": "popup.html"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+      },
+    "manifest_version": 2
+}
