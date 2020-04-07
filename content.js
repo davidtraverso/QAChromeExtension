@@ -6,11 +6,46 @@ var port = chrome.runtime.connect({ name: 'content' });
 /*** Qualification Level Scripts ***/
 var qualPage = '/admin/qualification.php';
 if (window.location.href.includes(qualPage)) {
+  /* Add observer that makes prices bold when scrolled down to recs */
+  var recsDiv = document.getElementById('recommended_products');
+  window.addEventListener('load', (e) => {
+    createObserver();
+  });
+  function createObserver() {
+    let observer;
+    let options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: [0.01],
+    };
+    observer = new IntersectionObserver(boldPrices, options);
+    observer.observe(recsDiv);
+  }
+
+  // Run regex to add a span around price text
+  function boldPrices() {
+    // Select recs from lead
+    var recs = document.querySelectorAll('#recommended_products .product_price');
+
+    // Assign regex to look for dollar amount
+    var regex = /[$](\d)+[k|\.|,]?(\d)*/gi;
+
+    // Loop over recs and add .match and style to each price note
+    var newHTML = [...recs].map((e) => {
+      return e.innerHTML.replace(regex, addSpan);
+    });
+    function addSpan(match) {
+      return `<span class="match" style="font-weight:bold;color:#000000;text-shadow:2px 2px 7px rgba(253, 128, 11, 0.8)">${match}</span>`;
+    }
+    for (var i = 0; i < recs.length; i++) {
+      recs[i].innerHTML = newHTML[i];
+    }
+  }
+
   // Render budget note as a sticky element above product pricing notes
   // Problem: sticky positioning won't work inside wrapper div (#main_content) since 'overflow:hidden'
   // Solution: add element outside of this wrapper
   // Solution: utilize the currently working 'sticky' navbar to add a new icon (utilize the environment and don't reinvent the wheel)
-
   /* Add icon to navbar */
   var navList = document.querySelector('#icons_top ul');
   // Fix width of parent <div> to prevent side effects
@@ -56,7 +91,7 @@ if (window.location.href.includes(qualPage)) {
   document.getElementById('icons_top').appendChild(budgetDiv);
 
   // Add listener icon that toggles budget note visibility on click
-  document.getElementById('quabity').addEventListener('click', function() {
+  document.getElementById('quabity').addEventListener('click', function () {
     let budgetDiv = document.getElementById('quabity_note');
     if (budgetDiv.style.visibility == 'hidden') {
       budgetDiv.style.visibility = 'visible';
@@ -71,7 +106,7 @@ if (window.location.href.includes(qualPage)) {
   function selectRecs() {
     let testRecs = document.querySelectorAll('#leads .lead_name');
     // Loop over Recommended Products to pull Product Name strings
-    let recsArray = [...testRecs].map(e => {
+    let recsArray = [...testRecs].map((e) => {
       return e.innerText;
     });
     console.log('recsArray');
@@ -93,7 +128,7 @@ if (window.location.href.includes(qualPage)) {
     // Loop over Available Products to pull Product Name strings
     console.log('Recommendations within highlightRecs()');
     console.log(Recommendations);
-    let availRecsArray = [...availRecs].map(e => {
+    let availRecsArray = [...availRecs].map((e) => {
       Recommendations.includes(e.innerText)
         ? e.parentNode.parentNode.setAttribute('style', `background:rgba(253, 128, 11, ${num})`)
         : null;
@@ -106,7 +141,7 @@ if (window.location.href.includes(qualPage)) {
   function selectAvailableProducts() {
     let availRecs = document.querySelectorAll('#recommended_products .product_name > a');
     // Loop over Available Products to pull Product Name strings
-    let availRecsArray = [...availRecs].map(e => {
+    let availRecsArray = [...availRecs].map((e) => {
       return e.innerText;
     });
     console.log('availRecsArray');
@@ -120,21 +155,21 @@ if (window.location.href.includes(qualPage)) {
   port.postMessage({
     sender: 'content',
     txt: 'hello from the DOM',
-    recs: Recommendations
+    recs: Recommendations,
   });
 
   // Listen for response
-  port.onMessage.addListener(res => {
+  port.onMessage.addListener((res) => {
     console.log(res.message);
     if (res.message == '200') {
       console.log('200 - request for avails');
       // Wait for DOM to receive products from Admin's PHP server
-      setTimeout(function() {
+      setTimeout(function () {
         AvailableProducts = selectAvailableProducts();
         console.log('AvailableProducts');
         console.log(AvailableProducts);
         port.postMessage({
-          avails: AvailableProducts
+          avails: AvailableProducts,
         });
       }, 1000);
     } else if (res.message == '201') {
@@ -149,7 +184,7 @@ if (window.location.href.includes(queuePage)) {
   // Get 'lead review assignments from extension storage'
   var myAdvisorsFromStorage;
   function getStoredTeam() {
-    chrome.storage.sync.get(['storedTeam'], async function(result) {
+    chrome.storage.sync.get(['storedTeam'], async function (result) {
       myAdvisorsFromStorage = await result['storedTeam'];
       myAdvisorsFromStorage.length <= 1 ? console.assert('Error: Could not find "storedTeam" in storage.') : null;
       // Prepare regex
@@ -183,18 +218,18 @@ if (window.location.href.includes(queuePage)) {
   }
 
   // Loop over table rows after 2 seconds
-  setTimeout(function() {
+  setTimeout(function () {
     // Create new regex
     var regex = new RegExp(myAdvisorString, 'i');
     var deletedDead = /####/g;
 
     // Loop over 'Pending Queue'
-    [...queueData].map(e => {
+    [...queueData].map((e) => {
       e.innerText.search(regex) !== -1 ? matches.push(e) : nonMatches.push(e);
     });
 
     // Loop over 'Deleted Queue'
-    [...deletedQueueData].map(e => {
+    [...deletedQueueData].map((e) => {
       if (e.innerText.search(regex) !== -1) {
         e.innerText.search(deletedDead) !== -1 ? deletedReviewed.push(e) : matches.push(e);
       } else {
@@ -203,15 +238,15 @@ if (window.location.href.includes(queuePage)) {
     });
 
     // Add styles to highlight each match
-    matches.map(e => {
+    matches.map((e) => {
       e.setAttribute('style', 'font-weight:bold; background:rgba(253, 128, 11, 0.3)');
     });
     // Add styles to lowlight each non-match
-    nonMatches.map(e => {
+    nonMatches.map((e) => {
       e.setAttribute('style', 'opacity: .3');
     });
     // Add styles to lowlight each deleted completed
-    deletedReviewed.map(e => {
+    deletedReviewed.map((e) => {
       e.setAttribute('style', 'opacity: .5; color:rgba(253, 128, 11) !important');
     });
 
