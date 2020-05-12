@@ -1,5 +1,5 @@
 // Content Script
-console.log('content.js');
+
 // Establish port
 var port = chrome.runtime.connect({ name: 'content' });
 
@@ -54,8 +54,6 @@ if (window.location.href.includes(qualPage)) {
   var iconSRC = 'https://software-advice.imgix.net/homepage/icon-brand_accounting.png';
   var budgetIcon = `<img id="quabity" src="${iconSRC}" alt="Show Budget" title="Show Budget" height="16" width="16">`;
   budgetItem.innerHTML = budgetIcon;
-  console.log('budgetItem');
-  console.log(budgetItem);
   // Add icon to navbar
   navList ? navList.appendChild(budgetItem) : null;
 
@@ -109,8 +107,6 @@ if (window.location.href.includes(qualPage)) {
     let recsArray = [...testRecs].map((e) => {
       return e.innerText;
     });
-    console.log('recsArray');
-    console.log(recsArray);
     return recsArray;
   }
   /* Invoke */
@@ -126,14 +122,11 @@ if (window.location.href.includes(qualPage)) {
   function highlightRecs(num) {
     let availRecs = document.querySelectorAll('#recommended_products .product_name > a');
     // Loop over Available Products to pull Product Name strings
-    console.log('Recommendations within highlightRecs()');
-    console.log(Recommendations);
     let availRecsArray = [...availRecs].map((e) => {
       Recommendations.includes(e.innerText)
         ? e.parentNode.parentNode.setAttribute('style', `background:rgba(253, 128, 11, ${num})`)
         : null;
     });
-    console.log('highlightRecs');
     return availRecsArray;
   }
 
@@ -144,8 +137,6 @@ if (window.location.href.includes(qualPage)) {
     let availRecsArray = [...availRecs].map((e) => {
       return e.innerText;
     });
-    console.log('availRecsArray');
-    console.log(availRecsArray);
     return availRecsArray;
   }
   var AvailableProducts;
@@ -160,14 +151,10 @@ if (window.location.href.includes(qualPage)) {
 
   // Listen for response
   port.onMessage.addListener((res) => {
-    console.log(res.message);
     if (res.message == '200') {
-      console.log('200 - request for avails');
       // Wait for DOM to receive products from Admin's PHP server
       setTimeout(function () {
         AvailableProducts = selectAvailableProducts();
-        console.log('AvailableProducts');
-        console.log(AvailableProducts);
         port.postMessage({
           avails: AvailableProducts,
         });
