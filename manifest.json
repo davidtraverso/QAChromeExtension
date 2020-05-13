@@ -1,6 +1,6 @@
 {
   "name": "QA Extension Assistant",
-  "version": "1.5",
+  "version": "1.5.1",
   "description": "Try to speed up lead review by limiting clicks and extending the viewport.",
   "permissions": ["declarativeContent", "storage", "activeTab", "tabs"],
   "background": {
