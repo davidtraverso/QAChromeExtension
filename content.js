@@ -101,6 +101,10 @@ if (window.location.href.includes(qualPage)) {
 
   /* Notes Scoring Feature */
   function listenForNoteHover() {
+    // Remove ID from Reports tab to kill Admin's jQuery listener that interferes with the mouseenter event below
+    let reportsTab = document.getElementById('menu_reports')
+    reportsTab.id = '';
+    
     let notesIcon = document.getElementsByClassName('contains-lead-score-form');
     [...notesIcon][0].addEventListener('mouseenter', (e) => {
       scoreNotes();
