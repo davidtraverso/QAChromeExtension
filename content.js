@@ -107,23 +107,28 @@ if (window.location.href.includes(qualPage)) {
     
     let notesIcon = document.getElementsByClassName('contains-lead-score-form');
     [...notesIcon][0].addEventListener('mouseenter', (e) => {
-      scoreNotes();
+      toggleNotesBox()
     });
   };
 
+  function toggleNotesBox() {
+    let notesBox = document.getElementById('lead_score_form');
+    notesBox.style.display === 'block' ? notesBox.style.display = 'none' : notesBox.style.display = 'block';
+    scoreNotes();
+  }
+
   function scoreNotes() {
-      document.getElementById('lead_score').click()
-      let list = document.getElementById('lead_score_form').firstElementChild;
-      [...list.children].map(listItem => {
-        listItem.addEventListener('click', (e) => {
-          e.target.dataset.score ? addScoreText(e.target.dataset.score) : addScoreText(e.target.firstElementChild.dataset.score);
-          // document.getElementById('save_score').click(); <-- BUG: Excessive window.alert()s with this added
-        })
-        // listItem.addEventListener('dblclick', (e) => {
-        //   document.getElementById('save_score').click();
-        //   e.stopPropagation();
-        // })
+    let list = document.getElementById('lead_score_form').firstElementChild;
+    [...list.children].map(listItem => {
+      listItem.addEventListener('click', (e) => {
+        e.target.dataset.score ? addScoreText(e.target.dataset.score) : addScoreText(e.target.firstElementChild.dataset.score);
+        // document.getElementById('save_score').click(); <-- BUG: Excessive window.alert()s with this added
       })
+      // listItem.addEventListener('dblclick', (e) => {
+      //   document.getElementById('save_score').click();
+      //   e.stopPropagation();
+      // })
+    })
   }
 
   function addScoreText(rating) {
